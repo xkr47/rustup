@@ -407,3 +407,43 @@ fn test_succeed_if_rustup_sh_already_installed_env_var_set() {
         assert!(!out.stdout.contains("Continue? (y/N)"));
     })
 }
+
+#[test]
+fn test_fail_on_home_mismatch_without_y_flag() {
+    setup(&|config| {
+        create_rustup_sh_metadata(&config);
+        let out = run_input_with_env(
+            config,
+            &["rustup-init"],
+            "",
+            &[("RUSTUP_INIT_SKIP_SUDO_CHECK", "no"),("HOME", "/non-existent")],
+        );
+        assert!(out
+            .stderr
+            .contains("if this is what you want, restart the installation with `-y'"));
+        assert!(!out
+            .stdout
+            .contains("Welcome to Rust!"));
+        assert!(!out.stdout.contains("Continue? (y/N)"));
+    })
+}
+
+#[test]
+fn test_succeed_on_home_mismatch_with_y_flag() {
+    setup(&|config| {
+        create_rustup_sh_metadata(&config);
+        let out = run_input_with_env(
+            config,
+            &["rustup-init", "-y"],
+            "",
+            &[("RUSTUP_INIT_SKIP_SUDO_CHECK", "no"),("HOME", "/non-existent")],
+        );
+        assert!(!out
+            .stderr
+            .contains("if this is what you want, restart the installation with `-y'"));
+        assert!(!out
+            .stdout
+            .contains("Welcome to Rust!"));
+        assert!(!out.stdout.contains("Continue? (y/N)"));
+    })
+}
