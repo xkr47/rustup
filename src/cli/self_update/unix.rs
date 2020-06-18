@@ -19,6 +19,7 @@ pub fn do_anti_sudo_check(no_prompt: bool) -> Result<utils::ExitCode> {
             .var_os("RUSTUP_INIT_SKIP_SUDO_CHECK")
             .map_or(false, |s| s == "yes")
         {
+            println!("SKIPPING SUDO CHECK");
             return fallback();
         }
 
